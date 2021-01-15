@@ -5,9 +5,11 @@ import robocode.control.*;
 import robocode.control.events.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 //
 // Application that demonstrates how to run two sample robots in Robocode using the
@@ -17,35 +19,48 @@ import java.nio.file.Paths;
 //
 public class BattleRunner {
 
-    private static final String PACKAGE_WITH_ROBOTS_NAME = "experimental";
-    private static final String ROBOT_NAME = "GoAheadRobot";
+    private static String packageName;
+    private static String robotName;
+    private static String robocodeInstallationPath;
 
-    public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation) throws IOException {
-        File sourceDirectory = new File(sourceDirectoryLocation);
-        File destinationDirectory = new File(destinationDirectoryLocation);
+    private static void loadConfiguration() throws IOException {
+        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        String appConfigPath = rootPath + "config.properties";
+        Properties configProps = new Properties();
+        configProps.load(new FileInputStream(appConfigPath));
+
+        packageName = configProps.getProperty("package");
+        robotName = configProps.getProperty("robot");
+        robocodeInstallationPath = configProps.getProperty("robocodeInstallation");
+    }
+
+    public static void copyDirectory(String source, String destination) throws IOException {
+        File sourceDirectory = new File(source);
+        File destinationDirectory = new File(destination);
         FileUtils.copyDirectory(sourceDirectory, destinationDirectory);
     }
 
-    private static void prepareCompiledBotsCointainerForRobocode() throws IOException {
+    private static void prepareCompiledBotsForRobocode() throws IOException {
 
-        File file = new File("robots/" + PACKAGE_WITH_ROBOTS_NAME);
+        String compiledBotsDirectory = "robots/" + packageName;
+        File file = new File(compiledBotsDirectory);
         if (!file.exists()) {
-            Files.createDirectory(Paths.get("robots/" + PACKAGE_WITH_ROBOTS_NAME));
+            Files.createDirectory(Paths.get(compiledBotsDirectory));
         }
-        copyDirectory("target/classes/" + PACKAGE_WITH_ROBOTS_NAME,
-                    "robots/" + PACKAGE_WITH_ROBOTS_NAME);
+        copyDirectory("target/classes/" + packageName, compiledBotsDirectory);
     }
 
     public static void main(String[] args) throws IOException {
 
-        prepareCompiledBotsCointainerForRobocode();
+        loadConfiguration();
+        prepareCompiledBotsForRobocode();
 
         // Disable log messages from Robocode
         RobocodeEngine.setLogMessagesEnabled(false);
 
         // Create the RobocodeEngine
         //   RobocodeEngine engine = new RobocodeEngine(); // Run from current working directory
-        RobocodeEngine engine = new RobocodeEngine(new java.io.File("C:/robocode")); // Run from C:/Robocode
+        RobocodeEngine engine = new RobocodeEngine(new java.io.File(robocodeInstallationPath));
 
         // Add our own battle listener to the RobocodeEngine
         engine.addBattleListener(new BattleObserver());
@@ -58,9 +73,9 @@ public class BattleRunner {
         int numberOfRounds = 5;
         BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600); // 800x600
 
-        String customRobot = PACKAGE_WITH_ROBOTS_NAME + '.' + ROBOT_NAME;
+        String customRobot = packageName + '.' + robotName + '*';
         RobotSpecification[] selectedRobots =
-                engine.getLocalRepository("sample.RamFire,sample.Corners," + customRobot + '*');
+                engine.getLocalRepository("sample.RamFire,sample.Corners," + customRobot);
 
         BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
 

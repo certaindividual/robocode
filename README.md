@@ -17,8 +17,14 @@ robocode.ui-1.9.3.9.jar
 robocode.ui.editor-1.9.3.9.jar  
 roborumble.jar  
 
-- add in robocode's application Options -> Preferences -> Development options -> Add  
+- add in robocode's application Options -> Preferences -> Development options -> Add 
+    - path-to-project/robots  
 
-path-to-project/robots  
+- provide in resources/config.properties:
+    - robot name and its package  
+    - directory of robocode installation
+
+
+
 
  
