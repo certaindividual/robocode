@@ -1,0 +1,1 @@
+This is a directory that should be provided in robocode's application Options -> Preferences -> Development options -> Add  

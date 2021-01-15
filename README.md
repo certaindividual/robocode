@@ -18,12 +18,7 @@ robocode.ui.editor-1.9.3.9.jar
 roborumble.jar  
 
 - add in robocode's application Options -> Preferences -> Development options -> Add  
-path to folder containing:
 
-- package directory
-    - .class file of our bot
+path-to-project/robots  
 
-In case of this project:  
-path-to-project/target/classes
-
-Make sure that path-to-project is not too long as it breaks the game completely. 
+ 

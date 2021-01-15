@@ -1,7 +1,13 @@
 package battle;
 
+import org.apache.commons.io.FileUtils;
 import robocode.control.*;
 import robocode.control.events.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 //
 // Application that demonstrates how to run two sample robots in Robocode using the
@@ -11,7 +17,28 @@ import robocode.control.events.*;
 //
 public class BattleRunner {
 
-    public static void main(String[] args) {
+    private static final String PACKAGE_WITH_ROBOTS_NAME = "experimental";
+    private static final String ROBOT_NAME = "GoAheadRobot";
+
+    public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation) throws IOException {
+        File sourceDirectory = new File(sourceDirectoryLocation);
+        File destinationDirectory = new File(destinationDirectoryLocation);
+        FileUtils.copyDirectory(sourceDirectory, destinationDirectory);
+    }
+
+    private static void prepareCompiledBotsCointainerForRobocode() throws IOException {
+
+        File file = new File("robots/" + PACKAGE_WITH_ROBOTS_NAME);
+        if (!file.exists()) {
+            Files.createDirectory(Paths.get("robots/" + PACKAGE_WITH_ROBOTS_NAME));
+        }
+        copyDirectory("target/classes/" + PACKAGE_WITH_ROBOTS_NAME,
+                    "robots/" + PACKAGE_WITH_ROBOTS_NAME);
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        prepareCompiledBotsCointainerForRobocode();
 
         // Disable log messages from Robocode
         RobocodeEngine.setLogMessagesEnabled(false);
@@ -30,7 +57,10 @@ public class BattleRunner {
 
         int numberOfRounds = 5;
         BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600); // 800x600
-        RobotSpecification[] selectedRobots = engine.getLocalRepository("sample.RamFire,sample.Corners,bots.GoAheadRobot*");
+
+        String customRobot = PACKAGE_WITH_ROBOTS_NAME + '.' + ROBOT_NAME;
+        RobotSpecification[] selectedRobots =
+                engine.getLocalRepository("sample.RamFire,sample.Corners," + customRobot + '*');
 
         BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
 
