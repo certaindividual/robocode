@@ -3,12 +3,10 @@ package battle;
 import org.deeplearning4j.gym.StepReply;
 import org.deeplearning4j.rl4j.mdp.MDP;
 import org.deeplearning4j.rl4j.space.ActionSpace;
-import org.deeplearning4j.rl4j.space.Encodable;
-import org.deeplearning4j.rl4j.space.HighLowDiscrete;
 import org.deeplearning4j.rl4j.space.ObservationSpace;
 
 
-public class RoboEnv<O extends Encodable, A, AS extends ActionSpace<A>> implements MDP<O, A, AS> {
+public class RoboEnv<O, A, AS extends ActionSpace<A>> implements MDP<O, A, AS> {
     @Override
     public ObservationSpace<O> getObservationSpace() {
         return null;

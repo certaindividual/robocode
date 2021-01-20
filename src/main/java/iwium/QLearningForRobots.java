@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * @author rubenfiszel (ruben.fiszel@epfl.ch) on 8/6/16.
+ * Based on parts of https://github.com/deeplearning4j/rl4j Apache licensed
  */
 public class QLearningForRobots<O extends Encodable> extends QLearningDiscrete<O> {
     public QLearningForRobots(MDP<O, Integer, DiscreteSpace> mdp, IDQN dqn, org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning.QLConfiguration conf,

@@ -1,16 +1,30 @@
 package experimental;
 
-import iwium.Action;
+import battle.RoboEnv;
 import iwium.QLearningForRobots;
 import org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning;
 import org.deeplearning4j.rl4j.network.dqn.DQNFactoryStdDense;
+import org.deeplearning4j.rl4j.space.Box;
+import org.deeplearning4j.rl4j.space.DiscreteSpace;
+import org.deeplearning4j.rl4j.util.DataManager;
 import org.nd4j.linalg.learning.config.RmsProp;
 import robocode.*;
+
+import java.io.File;
+import java.io.IOException;
 
 public class IwiumRobot extends AdvancedRobot {
 
     @Override
     public void run() {
+        DataManager manager = null;
+        try {
+            File f = getDataDirectory();
+            manager = new DataManager(f.toString(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         QLearning.QLConfiguration ROBOT_QL =
                 new QLearning.QLConfiguration(
                         2136,    //Random seed
@@ -36,7 +50,8 @@ public class IwiumRobot extends AdvancedRobot {
                         .numLayer(2)
                         .build();
 
-        // QLearningForRobots<> ql = new QLearningForRobots();
+        RoboEnv<Box, Integer, DiscreteSpace> mdp = new RoboEnv<>();
+        QLearningForRobots<Box> ql = new QLearningForRobots<>(mdp, ROBOT_NET, ROBOT_QL, manager);
 
         while(true) {
             ahead(100.0);

@@ -23,6 +23,8 @@ roborumble.jar
 - provide in resources/config.properties:
     - robot name and its package  
     - directory of robocode installation
+  
+- add "-DNOSECURITY=true -Ddebug=true" to VM settings
 
 
 
