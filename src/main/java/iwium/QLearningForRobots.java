@@ -6,6 +6,7 @@ import org.deeplearning4j.rl4j.mdp.MDP;
 import org.deeplearning4j.rl4j.network.dqn.DQNFactory;
 import org.deeplearning4j.rl4j.network.dqn.DQNFactoryStdDense;
 import org.deeplearning4j.rl4j.network.dqn.IDQN;
+import org.deeplearning4j.rl4j.space.Box;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
 import org.deeplearning4j.rl4j.space.Encodable;
 import org.deeplearning4j.rl4j.util.DataManager;
@@ -17,27 +18,27 @@ import java.util.List;
  * @author rubenfiszel (ruben.fiszel@epfl.ch) on 8/6/16.
  * Based on parts of https://github.com/deeplearning4j/rl4j Apache licensed
  */
-public class QLearningForRobots<O extends Encodable> extends QLearningDiscrete<O> {
-    public QLearningForRobots(MDP<O, Integer, DiscreteSpace> mdp, IDQN dqn, org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning.QLConfiguration conf,
-                                  DataManager dataManager) {
+public class QLearningForRobots extends QLearningDiscrete<Box> {
+    public QLearningForRobots(MDP<Box, Integer, DiscreteSpace> mdp, IDQN dqn, org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning.QLConfiguration conf,
+                              DataManager dataManager) {
         super(mdp, dqn, conf, dataManager, conf.getEpsilonNbStep());
     }
 
-    public QLearningForRobots(MDP<O, Integer, DiscreteSpace> mdp, DQNFactory factory,
+    public QLearningForRobots(MDP<Box, Integer, DiscreteSpace> mdp, DQNFactory factory,
                                   org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning.QLConfiguration conf, DataManager dataManager) {
         this(mdp, factory.buildDQN(mdp.getObservationSpace().getShape(), mdp.getActionSpace().getSize()), conf,
                 dataManager);
     }
 
-    public QLearningForRobots(MDP<O, Integer, DiscreteSpace> mdp, DQNFactoryStdDense.Configuration netConf,
+    public QLearningForRobots(MDP<Box, Integer, DiscreteSpace> mdp, DQNFactoryStdDense.Configuration netConf,
                                   QLearning.QLConfiguration conf, DataManager dataManager) {
         this(mdp, new DQNFactoryStdDense(netConf), conf, dataManager);
     }
 
     @Override
     public DataManager.StatEntry trainEpoch() {
-        InitMdp<O> initMdp = initMdp();
-        O obs = initMdp.getLastObs();
+        InitMdp<Box> initMdp = initMdp();
+        Box obs = initMdp.getLastObs();
 
         double reward = initMdp.getReward();
         int step = initMdp.getSteps();
@@ -52,7 +53,7 @@ public class QLearningForRobots<O extends Encodable> extends QLearningDiscrete<O
                 updateTargetNetwork();
             }
 
-            QLStepReturn<O> stepR = trainStep(obs);
+            QLStepReturn<Box> stepR = trainStep(obs);
 
             if (!stepR.getMaxQ().isNaN()) {
                 if (startQ.isNaN())
