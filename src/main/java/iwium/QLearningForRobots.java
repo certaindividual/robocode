@@ -1,5 +1,8 @@
 package iwium;
 
+import org.deeplearning4j.gym.StepReply;
+import org.deeplearning4j.rl4j.learning.Learning;
+import org.deeplearning4j.rl4j.learning.sync.Transition;
 import org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning;
 import org.deeplearning4j.rl4j.learning.sync.qlearning.discrete.QLearningDiscrete;
 import org.deeplearning4j.rl4j.mdp.MDP;
@@ -10,6 +13,8 @@ import org.deeplearning4j.rl4j.space.Box;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
 import org.deeplearning4j.rl4j.space.Encodable;
 import org.deeplearning4j.rl4j.util.DataManager;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.primitives.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,7 @@ public class QLearningForRobots extends QLearningDiscrete<Box> {
         this(mdp, new DQNFactoryStdDense(netConf), conf, dataManager);
     }
 
+    // Overriden primarly to change the modifier to public
     @Override
     public DataManager.StatEntry trainEpoch() {
         InitMdp<Box> initMdp = initMdp();

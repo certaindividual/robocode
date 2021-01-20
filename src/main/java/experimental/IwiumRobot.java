@@ -50,11 +50,9 @@ public class IwiumRobot extends AdvancedRobot {
                         .numLayer(2)
                         .build();
 
-        RoboEnv mdp = new RoboEnv();
+        RoboEnv mdp = new RoboEnv(this);
         QLearningForRobots ql = new QLearningForRobots(mdp, ROBOT_NET, ROBOT_QL, manager);
 
-        while(true) {
-            ahead(100.0);
-        }
+        ql.trainEpoch();
     }
 }

@@ -1,6 +1,11 @@
 package battle;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import robocode.AdvancedRobot;
 import iwium.RobotObservationSpace;
+import iwium.Action;
+
 import org.deeplearning4j.gym.StepReply;
 import org.deeplearning4j.rl4j.mdp.MDP;
 import org.deeplearning4j.rl4j.space.ActionSpace;
@@ -12,6 +17,7 @@ import org.deeplearning4j.nn.api.*;
 
 public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
+    AdvancedRobot robot;
     DiscreteSpace actionSpace;
     ObservationSpace<Box> observationSpace;
 
@@ -21,7 +27,8 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
         9 stay still
      */
 
-    public RoboEnv(){
+    public RoboEnv(AdvancedRobot robot){
+        this.robot = robot;
         this.actionSpace = new DiscreteSpace(9);
         this.observationSpace = new RobotObservationSpace();
     }
@@ -48,7 +55,15 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
     @Override
     public StepReply<Box> step(Integer a) {
-        return null;
+        if(a >= 0 && a < 9) {
+            this.robot.setTurnRight(a * 45.0);
+            this.robot.ahead(75);
+        } else if (a == 9) {
+            this.robot.doNothing();
+        }
+        JSONObject info = new JSONObject();
+        // temporary, figure out a reward
+        return new StepReply<>(makeObservations(), 0.0, false, info);
     }
 
     @Override
@@ -58,6 +73,13 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
     @Override
     public MDP<Box, Integer, DiscreteSpace> newInstance() {
-        return new RoboEnv();
+        return new RoboEnv(this.robot);
+    }
+
+    private Box makeObservations() {
+        // temporary
+        int[] obs = new int[] { 1,2,3,2,1 };
+        JSONArray ja = new JSONArray(obs);
+        return new Box(ja);
     }
 }
