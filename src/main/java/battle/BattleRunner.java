@@ -48,6 +48,7 @@ public class BattleRunner {
             Files.createDirectory(Paths.get(compiledBotsDirectory));
         }
         copyDirectory("target/classes/" + packageName, compiledBotsDirectory);
+        copyDirectory("target/classes/" + packageName, robocodeInstallationPath + "/" + compiledBotsDirectory);
     }
 
     public static void main(String[] args) throws IOException {
