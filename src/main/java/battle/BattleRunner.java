@@ -1,15 +1,17 @@
 package battle;
 
 import org.apache.commons.io.FileUtils;
+import org.deeplearning4j.rl4j.space.Box;
+import org.deeplearning4j.rl4j.space.DiscreteSpace;
+import org.deeplearning4j.rl4j.space.GymObservationSpace;
 import org.nd4j.linalg.factory.Nd4j;
 import robocode.control.*;
 import robocode.control.events.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Properties;
 
 //
@@ -23,6 +25,8 @@ public class BattleRunner {
     private static String packageName;
     private static String robotName;
     private static String robocodeInstallationPath;
+
+    public static int NUM_BATTLES = 250;
 
     private static void loadConfiguration() throws IOException {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
@@ -59,37 +63,26 @@ public class BattleRunner {
 
         // Disable log messages from Robocode
         RobocodeEngine.setLogMessagesEnabled(false);
-
-        // Create the RobocodeEngine
-        //   RobocodeEngine engine = new RobocodeEngine(); // Run from current working directory
         RobocodeEngine engine = new RobocodeEngine(new java.io.File(robocodeInstallationPath));
 
-        // Add our own battle listener to the RobocodeEngine
-        engine.addBattleListener(new BattleObserver());
-
-        // Show the Robocode battle view
+        ArrayList<Double> scores = new ArrayList<>();
+        engine.addBattleListener(new BattleObserver(scores));
         engine.setVisible(true);
 
-        // Setup the battle specification
-
-        int numberOfRounds = 10;
+        int numberOfRounds = NUM_BATTLES;
         BattlefieldSpecification battlefield = new BattlefieldSpecification(640, 640); // 800x600
 
         String customRobot = packageName + '.' + robotName + '*';
         RobotSpecification[] selectedRobots =
-                engine.getLocalRepository("sample.Fire,sample.SpinBot,sample.Crazy," + customRobot);
+                engine.getLocalRepository("sample.Crazy,sample.SittingDuck,sample.Crazy,sample.Crazy,sample.Crazy,sample.Crazy," + customRobot);
 
         Nd4j.getRandom();
 
         BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
 
-        // Run our specified battle and let it run till it is over
         engine.runBattle(battleSpec, true); // waits till the battle finishes
 
-        // Cleanup our RobocodeEngine
         engine.close();
-
-        // Make sure that the Java VM is shut down properly
         System.exit(0);
     }
 }
@@ -99,12 +92,16 @@ public class BattleRunner {
 //
 class BattleObserver extends BattleAdaptor {
 
+    ArrayList<Double> scores;
+
+    public BattleObserver(ArrayList<Double> scores){
+        this.scores = scores;
+    }
+
     // Called when the battle is completed successfully with battle results
     public void onBattleCompleted(BattleCompletedEvent e) {
         System.out.println("-- Battle has completed --");
 
-        // Print out the sorted results with the robot names
-        System.out.println("Battle results:");
         for (robocode.BattleResults result : e.getSortedResults()) {
             System.out.println("  " + result.getTeamLeaderName() + ": " + result.getScore());
         }

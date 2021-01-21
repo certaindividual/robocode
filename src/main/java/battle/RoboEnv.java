@@ -17,6 +17,7 @@ import robocode.ScannedRobotEvent;
 
 public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
+    public Double totalRewards = 0.0;
     public boolean done = false;
     public ScannedRobotEvent foundBot = null;
 
@@ -38,7 +39,7 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
     public RoboEnv(IRlRobot robot){
         this.robot = robot;
-        this.actionSpace = new DiscreteSpace(8);
+        this.actionSpace = new DiscreteSpace(7);
         this.observationSpace = new RobotObservationSpace();
     }
 
@@ -67,34 +68,48 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
     public StepReply<Box> step(Integer a) {
         switch(a){
             case 0:
-                robot.turnLeft(40);
+                robot.setTurnLeft(90);
+                robot.setAhead(100);
+                robot.execute();
                 break;
             case 1:
-                robot.turnLeft(20);
+                robot.setTurnLeft(45);
+                robot.setAhead(100);
+                robot.execute();
                 break;
             case 2:
-                robot.turnRight(20);
+                robot.setTurnRight(45);
+                robot.setAhead(100);
+                robot.execute();
                 break;
             case 3:
-                robot.turnRight(40);
+                robot.setTurnRight(90);
+                robot.setAhead(100);
+                robot.execute();
                 break;
             case 4:
-                robot.ahead(100);
+                robot.setFire(Rules.MAX_BULLET_POWER);
+                robot.setBack(50);
+                robot.execute();
                 break;
             case 5:
-                robot.back(100);
+                robot.fire(Rules.MAX_BULLET_POWER);
                 break;
             case 6:
-                robot.fireBullet(Rules.MAX_BULLET_POWER);
-                break;
-            case 7:
+                robot.setFire(Rules.MAX_BULLET_POWER);
+                robot.setAhead(100);
+                robot.execute();
                 break;
         }
         JSONObject info = new JSONObject();
-        // temporary, figure out a reward
         double reward = robot.popReward();
+        totalRewards += reward;
         boolean done = robot.isDone();
         return new StepReply<>(makeObservations(), reward, done, info);
+    }
+
+    public void setRobot(IRlRobot robot) {
+        this.robot = robot;
     }
 
     @Override
@@ -108,22 +123,22 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
     }
 
     private Box makeObservations() {
-        int fbDistance = 0;
-        int fbBearing = 0;
+        float fbDistance = 0;
+        float fbBearing = 0;
         if(foundBot != null) {
-            fbDistance = (int) (foundBot.getDistance() / 32);
-            fbBearing = (int) (foundBot.getBearing() / 36);
+            fbDistance = (float)foundBot.getDistance();
+            fbBearing = ((float)foundBot.getBearing() + 180.0f);
         }
-        int[] obs = new int[] {
-            (int)(robot.getX() / 64), (int)(robot.getY() / 64),
-            (int)(robot.getHeading() / 36),
-            (int)(robot.getGunHeading() / 36),
+        float[] obs = new float[] {
+                (float) robot.getX(), (float) robot.getY(),
+                (float) robot.getHeading(),
 
-            foundBot == null ? 0 : 1,
-            fbDistance,
-            fbBearing
+                foundBot == null ? 0 : 1,
+                fbDistance,
+                fbBearing
         };
         JSONArray ja = new JSONArray(obs);
+        foundBot = null;
         return new Box(ja);
     }
 }

@@ -27,21 +27,17 @@ public class RobotObservationSpace implements ObservationSpace<Box> {
     public RobotObservationSpace() {
         low = Nd4j.create(new float[]{0.0f, 0.0f,
                 0.0f,
-                0.0f,
 
                 0.0f,
                 0.0f,
-                -180.0f
-        });
-        high = Nd4j.create(new float[] {640.0f, 640.0f,
-            360.0f,
-            360.0f,
+                0.0f});
+        high = Nd4j.create(new float[] { 640.f, 640.0f,
+                360.0f,
 
-            1.0f,
-            640.0f,
-            180.0f
-        });
-        shape = new int[] {7};
+                1.0f,
+                640.0f,
+                360.0f});
+        shape = new int[] { 6 };
     }
 
     @Override
