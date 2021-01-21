@@ -1,35 +1,44 @@
 package battle;
 
+import experimental.IwiumRobot;
+import iwium.IRlRobot;
+import iwium.RobotObservationSpace;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import robocode.AdvancedRobot;
-import iwium.RobotObservationSpace;
-import iwium.Action;
 
 import org.deeplearning4j.gym.StepReply;
 import org.deeplearning4j.rl4j.mdp.MDP;
-import org.deeplearning4j.rl4j.space.ActionSpace;
 import org.deeplearning4j.rl4j.space.Box;
 import org.deeplearning4j.rl4j.space.DiscreteSpace;
 import org.deeplearning4j.rl4j.space.ObservationSpace;
-import org.nd4j.linalg.factory.Nd4j;
-import org.deeplearning4j.nn.api.*;
+import robocode.AdvancedRobot;
+import robocode.Rules;
+import robocode.ScannedRobotEvent;
 
 public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
-    AdvancedRobot robot;
+    public boolean done = false;
+    public ScannedRobotEvent foundBot = null;
+
+    IRlRobot robot;
     DiscreteSpace actionSpace;
     ObservationSpace<Box> observationSpace;
 
     /*
     Actions:
-        0-8 turn N*45 degrees clockwise (e.g. 0 -> 0, 2 -> 90) and go forward
-        9 stay still
+        turn left
+        light turn left
+        light turn right
+        turn right
+        forward 100
+        backward 100
+        shoot
+        stay still
      */
 
-    public RoboEnv(AdvancedRobot robot){
+    public RoboEnv(IRlRobot robot){
         this.robot = robot;
-        this.actionSpace = new DiscreteSpace(9);
+        this.actionSpace = new DiscreteSpace(8);
         this.observationSpace = new RobotObservationSpace();
     }
 
@@ -45,30 +54,52 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
 
     @Override
     public Box reset() {
-        return null;
+        System.out.println("reset called");
+        return makeObservations();
     }
 
     @Override
     public void close() {
-
+        System.out.println("close called");
     }
 
     @Override
     public StepReply<Box> step(Integer a) {
-        if(a >= 0 && a < 9) {
-            this.robot.setTurnRight(a * 45.0);
-            this.robot.ahead(75);
-        } else if (a == 9) {
-            this.robot.doNothing();
+        switch(a){
+            case 0:
+                robot.turnLeft(40);
+                break;
+            case 1:
+                robot.turnLeft(20);
+                break;
+            case 2:
+                robot.turnRight(20);
+                break;
+            case 3:
+                robot.turnRight(40);
+                break;
+            case 4:
+                robot.ahead(100);
+                break;
+            case 5:
+                robot.back(100);
+                break;
+            case 6:
+                robot.fireBullet(Rules.MAX_BULLET_POWER);
+                break;
+            case 7:
+                break;
         }
         JSONObject info = new JSONObject();
         // temporary, figure out a reward
-        return new StepReply<>(makeObservations(), 0.0, false, info);
+        double reward = robot.popReward();
+        boolean done = robot.isDone();
+        return new StepReply<>(makeObservations(), reward, done, info);
     }
 
     @Override
     public boolean isDone() {
-        return false;
+        return done;
     }
 
     @Override
@@ -77,8 +108,21 @@ public class RoboEnv implements MDP<Box, Integer, DiscreteSpace> {
     }
 
     private Box makeObservations() {
-        // temporary
-        int[] obs = new int[] { 1,2,3,2,1 };
+        int fbDistance = 0;
+        int fbBearing = 0;
+        if(foundBot != null) {
+            fbDistance = (int) (foundBot.getDistance() / 32);
+            fbBearing = (int) (foundBot.getBearing() / 36);
+        }
+        int[] obs = new int[] {
+            (int)(robot.getX() / 64), (int)(robot.getY() / 64),
+            (int)(robot.getHeading() / 36),
+            (int)(robot.getGunHeading() / 36),
+
+            foundBot == null ? 0 : 1,
+            fbDistance,
+            fbBearing
+        };
         JSONArray ja = new JSONArray(obs);
         return new Box(ja);
     }

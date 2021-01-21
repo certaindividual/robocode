@@ -40,7 +40,6 @@ public class QLearningForRobots extends QLearningDiscrete<Box> {
         this(mdp, new DQNFactoryStdDense(netConf), conf, dataManager);
     }
 
-    // Overriden primarly to change the modifier to public
     @Override
     public DataManager.StatEntry trainEpoch() {
         InitMdp<Box> initMdp = initMdp();

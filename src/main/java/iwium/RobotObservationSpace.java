@@ -13,15 +13,40 @@ public class RobotObservationSpace implements ObservationSpace<Box> {
     INDArray low;
     INDArray high;
 
+    /*
+        Observations:
+            our position (x,y)
+            our heading
+            our gun heading
+
+            found bot? flag
+            found bot distance
+            found bot bearing
+     */
+
     public RobotObservationSpace() {
-        low = Nd4j.create(new float[] {Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE});
-        high = Nd4j.create(new float[] {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE});
-        shape = new int[] {5};
+        low = Nd4j.create(new float[]{0.0f, 0.0f,
+                0.0f,
+                0.0f,
+
+                0.0f,
+                0.0f,
+                -180.0f
+        });
+        high = Nd4j.create(new float[] {640.0f, 640.0f,
+            360.0f,
+            360.0f,
+
+            1.0f,
+            640.0f,
+            180.0f
+        });
+        shape = new int[] {7};
     }
 
     @Override
     public String getName() {
-        return "Box(5,)";
+        return "Box";
     }
 
     @Override

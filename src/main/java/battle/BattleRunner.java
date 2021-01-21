@@ -1,6 +1,7 @@
 package battle;
 
 import org.apache.commons.io.FileUtils;
+import org.nd4j.linalg.factory.Nd4j;
 import robocode.control.*;
 import robocode.control.events.*;
 
@@ -71,12 +72,14 @@ public class BattleRunner {
 
         // Setup the battle specification
 
-        int numberOfRounds = 5;
-        BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600); // 800x600
+        int numberOfRounds = 10;
+        BattlefieldSpecification battlefield = new BattlefieldSpecification(640, 640); // 800x600
 
         String customRobot = packageName + '.' + robotName + '*';
         RobotSpecification[] selectedRobots =
-                engine.getLocalRepository("sample.RamFire,sample.Corners," + customRobot);
+                engine.getLocalRepository("sample.Fire,sample.SpinBot,sample.Crazy," + customRobot);
+
+        Nd4j.getRandom();
 
         BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
 
