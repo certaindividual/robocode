@@ -109,7 +109,7 @@ public class LutQLRobot extends AdvancedRobot {
         double currentRelativeEnemyY = Math.cos(Math.toRadians(enemyBearing)) * e.getDistance();
 
         // Select appropriate firepower for distance.
-        double firePower = 10;
+        double firePower = 1;
 
         // Calculate bullet speed.
         double bulletSpeed = 20 - firePower * 3;
@@ -126,7 +126,7 @@ public class LutQLRobot extends AdvancedRobot {
         double predictedBearing = Math.atan2(predicatedRelativeEnemyX, predicatedRelativeEnemyY) * 180 / 3.141592653589;
 
         selectTurnGunTowardsBearing(predictedBearing);
-        fire(firePower);
+        fire(1);
 
         distanceToEnemy = e.getDistance();
         angleToEnemy = e.getBearing();
