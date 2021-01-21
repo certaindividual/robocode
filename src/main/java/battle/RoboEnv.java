@@ -4,7 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import robocode.AdvancedRobot;
 import iwium.RobotObservationSpace;
-import iwium.Action;
 
 import org.deeplearning4j.gym.StepReply;
 import org.deeplearning4j.rl4j.mdp.MDP;

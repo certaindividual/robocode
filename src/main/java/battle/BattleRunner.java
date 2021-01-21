@@ -48,7 +48,7 @@ public class BattleRunner {
             Files.createDirectory(Paths.get(compiledBotsDirectory));
         }
         copyDirectory("target/classes/" + packageName, compiledBotsDirectory);
-        copyDirectory("target/classes/" + packageName, robocodeInstallationPath + "/" + compiledBotsDirectory);
+//        copyDirectory("target/classes/" + packageName, robocodeInstallationPath + "/" + compiledBotsDirectory);
     }
 
     public static void main(String[] args) throws IOException {
@@ -71,12 +71,12 @@ public class BattleRunner {
 
         // Setup the battle specification
 
-        int numberOfRounds = 5;
-        BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600); // 800x600
+        int numberOfRounds = 1;
+        BattlefieldSpecification battlefield = new BattlefieldSpecification(600, 600); // 800x600
 
         String customRobot = packageName + '.' + robotName + '*';
         RobotSpecification[] selectedRobots =
-                engine.getLocalRepository("sample.RamFire,sample.Corners," + customRobot);
+                engine.getLocalRepository("sample.Corners,sample.Crazy," + customRobot);
 
         BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
 
@@ -104,6 +104,7 @@ class BattleObserver extends BattleAdaptor {
         System.out.println("Battle results:");
         for (robocode.BattleResults result : e.getSortedResults()) {
             System.out.println("  " + result.getTeamLeaderName() + ": " + result.getScore());
+//            System.out.println("  " + result.getTeamLeaderName() + ": " + result.getSurvival());
         }
     }
 
